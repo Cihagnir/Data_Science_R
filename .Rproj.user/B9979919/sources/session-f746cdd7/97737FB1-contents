@@ -1,0 +1,322 @@
+## Preparation Stage
+
+### Library Install Section
+
+```{r}
+
+install.packages("dplyr")
+install.packages("readxl")
+install.packages("writexl")
+install.packages("ggplot2")
+```
+
+### Library Import Section
+
+```{r}
+library("dplyr")
+library("readxl")
+library("ggplot2")
+```
+
+## Data Preparation Section
+
+### Basic Manipulation
+
+```{r}
+# Read the XLS data from .RDS file.
+hls_data = readRDS("hls2011.rds")
+
+# Head check from our data 
+head(hls_data)
+
+```
+
+```{r}
+# You can also check the tail either
+tail(hls_data)
+```
+
+```{r}
+# You can select the spesific columns on your data 
+hls_data |> 
+  select(female, urban, educ) |>
+    head(3)
+
+```
+
+```{r}
+# In that style you are eliminate the columns instead of selection it.
+hls_data |> 
+  select(-female, -educ, -urban) |>
+    head(3)
+```
+
+```{r}
+# Table gives you count of your unique variable 
+table(hls_data$exper)
+```
+
+```{r}
+# With the cut, you can create the sub section and put your data these subsection where they belong.
+cutted_data  = cut(
+  x = hls_data$exper, 
+  breaks = c(0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90),
+  include.lowest = TRUE,
+  )
+
+table(cutted_data)
+```
+
+```{r "Demo code for categorize"}
+# you can use the categorize function in two way 
+one_by_one = c(2002, 2003, 2004, 2005, 2006)
+one_by_one
+
+all_in_one = c(2002:2006)
+all_in_one
+```
+
+```{r}
+hls_data |>
+  filter(exper > 50) |>
+    head()
+```
+
+```{r}
+
+```
+
+### Statistical Analysis
+
+```{r}
+# With the `summarise` function we can create the statistical summary on our data set. You can find the usage on code.
+
+hls_data |> 
+  group_by(exper) |>
+    summarise(
+      educ_std = sd(educ),
+      hwage_avg = mean(hwage),
+      educ_mean = mean(educ)
+      ) |>
+        head()
+
+```
+
+Mini Note : In the R function are not able to tolerate the NA values. So If you use that you have to clear them first.
+
+```{r}
+hls_data  |>
+  mutate(
+    gender = factor(female, levels=0:1, labels= c("Men", "Women")) 
+  ) |> 
+    head()
+```
+
+```{r "Demo code for casewhen"}
+# Case when is actually embedded case structure from C lang
+hls_data = hls_data |>
+  mutate(
+    reg_gr= case_when(
+      nuts1 %in% c("N1","N5","N3") ~ "Big3",
+      nuts1 %in% c("N2","N4","N6") ~ "Fadil",
+      .default = "Unknown"
+    )
+  )
+```
+
+```{r}
+table(hls_data$reg_gr)
+```
+
+```{r "Demo code for factor"}
+factor(hls_data$female, levels=0:1, labels= c("Men", "Women")) |>
+  head()
+```
+
+##### Null Data Handling
+
+```{r}
+# That is the basic NA check
+head(is.na(hls_data$hwage))
+```
+
+```{r}
+# You can check the total data null value. 
+sum(is.na(hls_data$hwage))
+```
+
+```{r}
+hls_data |>
+  mutate(female = factor(female, levels=0:1,
+                        labels = c("Men", "Women")),
+         educ_yrs = educ,
+         educ_gr = factor(educ, levels = c(0, 2, 5, 8, 11, 15),
+                          labels=c("ND", "IPS", "PS", "MS", "HS", "Uni"))
+         # IPS: incomplete primary school
+         ) ->hls_data
+
+```
+
+```{r}
+summary(lm(hwage ~ educ, data=hls_data))
+```
+
+The linear regression model we use, fit the out two variable into single line. Beside that example also you can gives the the factored parameter x axes side. In that settings its create one line for each parameters.
+
+```{r}
+summary(lm(hwage ~ factor(educ), data=hls_data))
+```
+
+Also " t value " has positive corroletoin with our model performance. It t value can assest as score of the model in a limited perspective.
+
+```{r "Demo for aggregate"}
+aggregate(hwage ~ educ_gr, data=hls_data, FUN=mean)
+```
+
+```{r "Demo for xtabs"}
+# Technically you can get the same table from both function.  
+xtabs(~ educ_gr+female, data=hls_data)
+```
+
+```{r "Demo for table"}
+table(hls_data$educ_gr,hls_data$female)
+```
+
+```{r "Demo for addmargins"}
+# Addmargins basically sum the all the row and column to make eye made statistical analysis more easy.
+tabs = xtabs(~ educ_gr + female, data=hls_data)
+addmargins(tabs)
+```
+
+```{r "Demo for cbind"}
+z = c(1,4,72,3,6,22,17)
+z_gr = cut(z, breaks = c(1,10,20,72),
+           labels = c("1-10", "11-20", "21-72"),
+           include.lowest=TRUE)
+cbind(z, z_gr)
+```
+
+## Data Visualization Section
+
+In the data visualization section we mainly use the default data which came with R language. I will write the our data name on top of the section.
+
+```{r}
+mtcars|>head(3)
+```
+
+```{r}
+pressure|>head(3)
+```
+
+Technical explanation :
+
+ggplot has a same structure with "plotly" library. In the both library we create the figure and add the something on that figure to create the our graph. In there we did the same thing. We create the our figure and set the our common axis for our both graph. Than add the our layer into our graph.
+
+```{r "Data is mtcars" : "Combine Graph"}
+ggplot( data = mtcars, aes(x=mpg) ) + 
+  geom_point(aes(y=hp), col = "blue", size=4 ) +
+  geom_line(aes(y=disp), col = "red", linewidth=1)
+  
+```
+
+```{r "Data is mtcars" : "Scatter Graph"}
+# You can change your color depending on your third factor on the discrete pakette
+ggplot(data = mtcars, aes(x= mpg)) + 
+  geom_point( aes(y= hp, col= factor(cyl) ), size= 3 )
+
+```
+
+```{r "Data is mtcars" : "Scatter Graph"}
+# With facer graph we can create the subplot
+ggplot(mtcars, aes(x= mpg) ) + 
+  geom_point( aes( y= wt, col= factor(cyl) ) )+
+  facet_wrap(~cyl, nrow= 3, ncol= 1 )
+```
+
+```{r}
+# That is an another way to create the same graph 
+ggplot(mtcars, aes(x= mpg) ) +
+  geom_point(aes(y= wt, col= factor(cyl))) +
+  facet_grid(rows= vars(cyl))
+```
+
+```{r "Data is mtcars" : "Line Graph"}
+# Or continuous palette
+ggplot(data = mtcars, aes(x= mpg)) + 
+  geom_point( aes(y= hp, col= cyl ), size= 3 ) +
+  geom_line( aes(y=hp, col= cyl), linewidth= 1)
+```
+
+```{r "Data is pressure" : "Line Graph"}
+ggplot(data=pressure, aes(x=temperature)) +
+  geom_line(aes(y = pressure), linewidth = 1, col = "red") +
+  geom_line(aes(y = rev(pressure)), linewidth = 1, col = "blue" )
+
+```
+
+```{r "Data is mtcars" : "Density Graph"}
+# In the density graph color function act as group seperater
+ggplot(
+  data= mtcars, 
+  aes(x=mpg, color= factor(cyl), fill = factor(cyl) ) 
+  ) + 
+  geom_density(linewidth= 1, alpha=0.4) # alpha set the transparency
+```
+
+##### Bar Graph Explanation
+
+stat -\>\
+identity : That is gives the count of the Y axis variable.
+
+```{r "Data is mtcars" : "Bar Graph"}
+ggplot(data= mtcars, aes(x= cyl) )+
+  geom_bar(aes(y=gear), fill="blue", 
+           stat = "identity", width = 0.2)
+
+```
+
+```{r "Data is mtcars" : "Bar Graph"}
+# Also you can group your data like that
+ggplot(data= mtcars, aes(x= cyl, col=factor(gear)) )+
+  geom_bar(aes(y=gear,fill = factor(gear)), 
+           stat = "identity", width = 0.4)
+```
+
+Difference between " identity " & " stack " or " count " is the way more than we thing. On the " identity " we sum the actually or y axis parameter. However, we count the number of the value which fit the parameter restriction on the "stack" or "count" setting.
+
+```{r "Data is mtcars" : "Bar Graph"}
+# Also you can group your data like that
+ggplot(data= mtcars, aes(x= cyl, fill=factor(gear)) )+
+  geom_bar(position = "stack", width = 0.4,
+           stat="count")
+
+```
+
+```{r "Data is mtcars" : "Bar Graph"}
+# That is the another position parameter
+plotSave = ggplot(data= mtcars, aes(x= cyl, fill=factor(gear)) )+
+  geom_bar(position = "dodge", stat="count", width = 0.4) + 
+  ylim(0,13) # + xlim(3:9) > You can also limit the our axes limit.\
+plotSave
+```
+
+```{r "Data is hls_data" : "Frequency/Histogram Graph "}
+# You can also add the stack option into your histogram.
+ggplot(data = hls_data, aes(x=hwage)) +
+  geom_histogram(aes( fill= factor(educ) )) 
+```
+
+```{r "Data is hls_data" : "Box Plot"}
+ggplot(data= hls_data, mapping= aes(x= hwage, fill= factor(educ))) + 
+  geom_boxplot() + 
+  facet_grid(rows= vars(educ_gr) )
+```
+
+```{r}
+
+```
+
+```{r}
+# And that is the how we save the our plot
+ggsave("myPlot.pdf", plotSave, height= 8, width= 8, units= "cm")
+```

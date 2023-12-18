@@ -1,0 +1,28 @@
+{
+    "id": "C2AD1613",
+    "path": null,
+    "project_path": null,
+    "type": "object_explorer",
+    "hash": "0",
+    "contents": "",
+    "dirty": false,
+    "created": 1702834554644.0,
+    "source_on_save": false,
+    "relative_order": 8,
+    "properties": {
+        "id": "da5f240d22074f0eb115ef1169415f03",
+        "name": "nationality_data_null_table",
+        "title": "nationality_data_null_table",
+        "language": "R",
+        "source_window_id": "",
+        "Source": "Source"
+    },
+    "folds": "",
+    "lastKnownWriteTime": 3180215545357154096,
+    "encoding": "",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1702834554644,
+    "read_only": false,
+    "read_only_alternatives": []
+}

@@ -1,0 +1,28 @@
+{
+    "id": "274EF358",
+    "path": null,
+    "project_path": null,
+    "type": "object_explorer",
+    "hash": "0",
+    "contents": "",
+    "dirty": false,
+    "created": 1702834554623.0,
+    "source_on_save": false,
+    "relative_order": 7,
+    "properties": {
+        "id": "4142d517ac544d238fd14b8c320f9748",
+        "name": "sales_data_null_table",
+        "title": "sales_data_null_table",
+        "language": "R",
+        "source_window_id": "",
+        "Source": "Source"
+    },
+    "folds": "",
+    "lastKnownWriteTime": 2314885530450145326,
+    "encoding": "",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1702834554623,
+    "read_only": false,
+    "read_only_alternatives": []
+}

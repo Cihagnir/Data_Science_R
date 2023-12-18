@@ -1,0 +1,28 @@
+{
+    "id": "7196F60D",
+    "path": null,
+    "project_path": null,
+    "type": "object_explorer",
+    "hash": "0",
+    "contents": "",
+    "dirty": false,
+    "created": 1702834554603.0,
+    "source_on_save": false,
+    "relative_order": 6,
+    "properties": {
+        "id": "5065bbb8b8ba414ba5081b764fce84ec",
+        "name": "province_data_null_table",
+        "title": "province_data_null_table",
+        "language": "R",
+        "source_window_id": "",
+        "Source": "Source"
+    },
+    "folds": "",
+    "lastKnownWriteTime": 3474582329457915697,
+    "encoding": "",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1702834554603,
+    "read_only": false,
+    "read_only_alternatives": []
+}
