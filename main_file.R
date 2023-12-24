@@ -188,35 +188,70 @@ sales_data |>
 #####  
 
 #####  Whole sales data we have #####  
-graph_three <- plot_ly()
+graph_two <- plot_ly()
 
-graph_three |> 
+graph_two |> 
   add_trace(
     data = sales_data,
     x = ~Date_numeric,
     y = ~norm_forg_sales,
     name = 'Forg House Sales',
     type = 'scatter', mode = 'lines+markers',
-    line = list(width = 3)) -> graph_three
+    line = list(width = 3)) -> graph_two
 
-graph_three |> 
+graph_two |> 
   add_trace(
     data = sales_data,
     x = ~Date_numeric,
     y = ~norm_total_sales,
     name = 'Total House Sales',
     type = 'scatter', mode = 'lines+markers',
+    line = list(width = 3)) -> graph_two
+
+graph_two
+
+##### 
+
+#####  Detailed search for sales on specific year as 2018 #####  
+
+graph_three <- plot_ly()
+  
+temp_data = sales_data|> filter(Year == 2018)
+temp_data$Month <- factor(temp_data$Month, levels = temp_data[['Month']])
+temp_data <- temp_data |> 
+  mutate(
+    norm_forg_sales = log(Foreigners_Sales),
+    norm_total_sales = log(Total)
+  )
+
+graph_three |> 
+  add_trace(
+    data = temp_data,
+    x = ~Month,
+    y = ~norm_forg_sales,
+    name = '2019 Forg House Sales',
+    type = 'scatter', mode = 'lines+markers',
+    line = list(width = 3)) -> graph_three
+
+graph_three |> 
+  add_trace(
+    data = temp_data,
+    x = ~Month,
+    y = ~norm_total_sales,
+    name = '2019 Total House Sales',
+    type = 'scatter', 
+    mode = 'lines+markers',
     line = list(width = 3)) -> graph_three
 
 graph_three
 
-##### 
+#####
 
-#####  Detailed search for sales on specific year as 2016 - 2020 #####  
+#####  Detailed search for sales on specific year as 2018 #####  
 
 graph_four <- plot_ly()
-  
-temp_data = sales_data|> filter(Year == 2018)
+
+temp_data = sales_data|> filter(Year == 2020)
 temp_data$Month <- factor(temp_data$Month, levels = temp_data[['Month']])
 temp_data <- temp_data |> 
   mutate(
@@ -229,7 +264,7 @@ graph_four |>
     data = temp_data,
     x = ~Month,
     y = ~norm_forg_sales,
-    name = '2019 Forg House Sales',
+    name = '2020 Forg House Sales',
     type = 'scatter', mode = 'lines+markers',
     line = list(width = 3)) -> graph_four
 
@@ -238,7 +273,7 @@ graph_four |>
     data = temp_data,
     x = ~Month,
     y = ~norm_total_sales,
-    name = '2019 Total House Sales',
+    name = '2020 Total House Sales',
     type = 'scatter', 
     mode = 'lines+markers',
     line = list(width = 3)) -> graph_four
@@ -268,17 +303,17 @@ sales_data |>
 #####  Pie chart for city distrubition on sales #####  
 temp_data <- province_data_long_version |> group_by(City) |> dplyr::summarise(sales = `mean`(Value))
 
-graph_four <- plot_ly(
+graph_six <- plot_ly(
                 labels = temp_data$City, 
                 values = temp_data$sales, 
                 type = 'pie')
 
-graph_four <- graph_four |> 
+graph_six <- graph_four |> 
   layout(title = 'House Sales Based City ',
                     xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
                     yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE))
 
-graph_four
+graph_six
 
 ##### 
 
@@ -292,26 +327,26 @@ province_data_long_version |>
 
 temp_data$Season <- factor(temp_data$Season, levels = c('Winter','Spring','Summer','Autumn'))
 
-graph_five <- plot_ly()
+graph_seven <- plot_ly()
 
 for (city_val in temp_data$City|>unique()){
   
   temp_data_two = temp_data|>filter(City == city_val)
   
-  graph_five |> 
+  graph_seven |> 
     add_trace( 
       data = temp_data_two, 
       x = ~Season,
       y = ~sales,
-      name = city_val) -> graph_five
+      name = city_val) -> graph_seven
 }
 
-graph_five |>
+graph_seven |>
 layout(
   barmode = 'group'
-  ) -> graph_five
+  ) -> graph_seven
 
-graph_five 
+graph_seven 
   
 #####  
 
@@ -469,11 +504,66 @@ map_three
 
 #####  
 
+#####  Nationality Inspectation ##### 
+nationality_data |> 
+  group_by( Country ) |>
+  dplyr::summarise(
+    Total_sales = sum(Total)
+  ) -> temp_data 
 
+temp_data <- temp_data[!(temp_data$Country == "Other countries"), ]
+temp_data <- temp_data[order(temp_data$Total_sales,decreasing = TRUE),]
+temp_data$Country <- factor(temp_data$Country, levels = temp_data[['Country']])
+
+plot_ly(
+  data = temp_data,
+  x = ~Country,
+  y = ~Total_sales,
+  type = 'bar', 
+  marker = list(
+    colorscale = list(
+      c(0, max( temp_data$Total_sales) ), 
+      c("lawngreen", "red")
+    ),
+    colorbar = list( title = "House Sold Decade" ),
+    color = ~Total_sales
+  )
+) -> graph_eight 
+
+graph_eight
+
+#####  
+
+##### Top 3 For Sales Historically #####
+
+
+temp_data <- nationality_data |> filter((Country == 'Iraq') | (Country == 'Russia') | (Country == 'Iran'))
+temp_data <- temp_data |> mutate(norm_total = log(Total))
+
+graph_nine <- plot_ly()
+
+for (nat_val in temp_data$Country |> unique()){
+  
+  filter_data <- temp_data|> filter(Country == nat_val)
+  
+  graph_nine |> 
+    add_trace(
+      data = filter_data,
+      x = ~Year,
+      y = ~Total,
+      name = paste(as.character(nat_val),'House Sales'),
+      type = 'scatter', mode = 'lines+markers',
+      line = list(width = 3)) -> graph_nine 
+  
+  
+}
+
+graph_nine
+
+#####
 
 
 ########### DUMMY SECTION ########### 
-
 
 
 
